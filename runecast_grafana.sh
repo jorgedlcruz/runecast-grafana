@@ -104,7 +104,7 @@ RunecastAnalysisUrl=$(curl -X GET --header "Accept:application/json" --header "A
     RunecastAnalysisIssueAppliesTo=$(echo "$RunecastAnalysisUrl" | jq --raw-output ".results[].issues[$arrayanalysis].appliesTo")
     RunecastAnalysisIssueSeverity=$(echo "$RunecastAnalysisUrl" | jq --raw-output ".results[].issues[$arrayanalysis].severity")
     RunecastAnalysisIssueType=$(echo "$RunecastAnalysisUrl" | jq --raw-output ".results[].issues[$arrayanalysis].type")
-    RunecastAnalysisIssueTitle=$(echo "$RunecastAnalysisUrl" | jq --raw-output ".results[].issues[$arrayanalysis].title" | awk '{gsub(/ /,"\\ ");print}')
+    RunecastAnalysisIssueTitle=$(echo "$RunecastAnalysisUrl" | jq --raw-output ".results[].issues[$arrayanalysis].title" | awk '{gsub(",", "", $0); print}' | awk '{gsub(/ /,"\\ ");print}')
     RunecastAnalysisIssueURL=$(echo "$RunecastAnalysisUrl" | jq --raw-output ".results[].issues[$arrayanalysis].url")
     RunecastAnalysisIssueObjectsCount=$(echo "$RunecastAnalysisUrl" | jq --raw-output ".results[].issues[$arrayanalysis].affectedObjectsCount")
     RunecastAnalysisIssueStatus=$(echo "$RunecastAnalysisUrl" | jq --raw-output ".results[].issues[$arrayanalysis].status")
@@ -123,8 +123,8 @@ RunecastAnalysisUrl=$(curl -X GET --header "Accept:application/json" --header "A
         RunecastAnalysisIssueObjectName=$(echo "$RunecastAnalysisIssuesAffectedJSON" | jq --raw-output ".[$arrayobjects].name" | awk '{gsub(/ /,"\\ ");print}')  
         RunecastAnalysisIssueObjectType=$(echo "$RunecastAnalysisIssuesAffectedJSON" | jq --raw-output ".[$arrayobjects].type")
         RunecastAnalysisIssueObjectMOID=$(echo "$RunecastAnalysisIssuesAffectedJSON" | jq --raw-output ".[$arrayobjects].moid")
-        RunecastAnalysisIssueObjectDescription=$(echo "$RunecastAnalysisIssuesAffectedJSON" | jq --raw-output ".[$arrayobjects].resultValues[0].description" | awk '{gsub(/ /,"\\ ");print}' | awk '{gsub(",", "", $0); print}' | awk '{gsub(":", "", $0); print}') 
-        RunecastAnalysisIssueObjectValue=$(echo "$RunecastAnalysisIssuesAffectedJSON" | jq --raw-output ".[$arrayobjects].resultValues[0].value" | awk '{gsub(/ /,"\\ ");print}' | awk '{gsub("=", "-", $0); print}' | awk '{gsub(",", "", $0); print}' | awk '{gsub(":", "", $0); print}')
+        RunecastAnalysisIssueObjectDescription=$(echo "$RunecastAnalysisIssuesAffectedJSON" | jq --raw-output ".[$arrayobjects].resultValues[0].description" | awk '{gsub(",", "", $0); print}' | awk '{gsub(/ /,"\\ ");print}' ) 
+        RunecastAnalysisIssueObjectValue=$(echo "$RunecastAnalysisIssuesAffectedJSON" | jq --raw-output ".[$arrayobjects].resultValues[0].value" | awk '{gsub(",", "", $0); print}' | awk '{gsub("=", "-", $0); print}' | awk '{gsub(/ /,"\\ ");print}')
         [[ ! -z "$RunecastAnalysisIssueObjectValue" ]] || RunecastAnalysisIssueObjectValue="None"
         
         ##Un-comment the following echo for debugging    
