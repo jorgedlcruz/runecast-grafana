@@ -115,7 +115,7 @@ RunecastAnalysisUrl=$(curl -X GET --header "Accept:application/json" --header "A
 
     ##Comment the Curl while debugging
     echo "Writing runecast_results_analysis to InfluxDB"
-    curl -i -XPOST "$InfluxDBURL:$InfluxDBPort/write?precision=ms&db=$InfluxDB" -u "$InfluxDBUser:$InfluxDBPassword" --data-binary "runecast_results_analysis,rc2Appliance=$runecastServer,rc2IssueID=$RunecastAnalysisIssueID,rc2IssueDisplayID=$RunecastAnalysisIssueDisplayID,rc2IssueAffects=$RunecastAnalysisIssueAffects,rc2IssueProduct=$RunecastAnalysisIssueProduct,rc2IssueApplietsTo=$RunecastAnalysisIssueAppliesTo,rc2IssueSeverity=$RunecastAnalysisIssueSeverity,rc2IssueType=$RunecastAnalysisIssueType,rc2IssueTitle=$RunecastAnalysisIssueTitle,rc2IssueURL=$RunecastAnalysisIssueURL,rc2IssueStatus=$RunecastAnalysisIssueStatus rc2IssueObjectsCount=$RunecastAnalysisIssueObjectsCount"
+    curl -i -XPOST "$InfluxDBURL:$InfluxDBPort/write?precision=ms&db=$InfluxDB" -u "$InfluxDBUser:$InfluxDBPassword" --data-binary "runecast_results_analysis,rc2Appliance=$runecastServer,rc2IssueID=$RunecastAnalysisIssueID,rc2IssueDisplayID=$RunecastAnalysisIssueDisplayID,rc2IssueAffects=$RunecastAnalysisIssueAffects,rc2IssueProduct=$RunecastAnalysisIssueProduct,rc2IssueApplietsTo=$RunecastAnalysisIssueAppliesTo,rc2IssueSeverity=$RunecastAnalysisIssueSeverity,rc2IssueType=$RunecastAnalysisIssueType,rc2IssueTitle=$RunecastAnalysisIssueTitle,rc2IssueURL=$RunecastAnalysisIssueURL,rc2IssueStatus=$RunecastAnalysisIssueStatus rc2IssueObjectsCount=$RunecastAnalysisIssueObjectsCount $RunecastResultsTimeTS"
     
     declare -i arrayobjects=0
     for row in $(echo "$RunecastAnalysisIssuesAffectedJSON" | jq -r '.[].vcUid'); do
@@ -132,7 +132,7 @@ RunecastAnalysisUrl=$(curl -X GET --header "Accept:application/json" --header "A
         
         ##Comment the Curl while debugging
         echo "Writing runecast_results_analysis to InfluxDB"
-        curl -i -XPOST "$InfluxDBURL:$InfluxDBPort/write?precision=ms&db=$InfluxDB" -u "$InfluxDBUser:$InfluxDBPassword" --data-binary "runecast_results_analysis,rc2Appliance=$runecastServer,rc2IssueID=$RunecastAnalysisIssueID,rc2IssueDisplayID=$RunecastAnalysisIssueDisplayID,rc2IssueObjectID=$RunecastAnalysisIssueObjectID,rc2IssueObjectName=$RunecastAnalysisIssueObjectName,rc2IssueObjectType=$RunecastAnalysisIssueObjectType,rc2IssueObjectMOID=$RunecastAnalysisIssueObjectMOID,rc2IssueObjectDesc=$RunecastAnalysisIssueObjectDescription,rc2IssueObjectValue=$RunecastAnalysisIssueObjectValue rc2IssueObjectsCount=$RunecastAnalysisIssueObjectsCount"
+        curl -i -XPOST "$InfluxDBURL:$InfluxDBPort/write?precision=ms&db=$InfluxDB" -u "$InfluxDBUser:$InfluxDBPassword" --data-binary "runecast_results_analysis,rc2Appliance=$runecastServer,rc2IssueID=$RunecastAnalysisIssueID,rc2IssueDisplayID=$RunecastAnalysisIssueDisplayID,rc2IssueObjectID=$RunecastAnalysisIssueObjectID,rc2IssueObjectName=$RunecastAnalysisIssueObjectName,rc2IssueObjectType=$RunecastAnalysisIssueObjectType,rc2IssueObjectMOID=$RunecastAnalysisIssueObjectMOID,rc2IssueObjectDesc=$RunecastAnalysisIssueObjectDescription,rc2IssueObjectValue=$RunecastAnalysisIssueObjectValue rc2IssueObjectsCount=$RunecastAnalysisIssueObjectsCount $RunecastResultsTimeTS"
         
         arrayobjects=$arrayobjects+1
     done
