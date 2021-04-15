@@ -89,27 +89,29 @@ RunecastLicenseUrl=$(curl -X GET --header "Accept:application/json" --header "Au
 RunecastUrl="https://$runecastServer/rc2/api/v1/results?onlyDetectedIssues=true"
 RunecastAnalysisUrl=$(curl -X GET --header "Accept:application/json" --header "Authorization:$runecastToken" "$RunecastUrl" 2>&1 -k --silent)
 
-    RunecastResultsID=$(echo "$RunecastAnalysisUrl" | jq --raw-output ".results[0].uid")
-    RunecastResultsTime=$(echo "$RunecastAnalysisUrl" | jq --raw-output ".results[0].scanStatus.timestamp")
+declare -i arraytopanalysis=0
+  for row in $(echo "$RunecastAnalysisUrl" | jq -r '.results[].uid'); do
+    RunecastResultsID=$(echo "$RunecastAnalysisUrl" | jq --raw-output ".results[$arraytopanalysis].uid")
+    RunecastResultsTime=$(echo "$RunecastAnalysisUrl" | jq --raw-output ".results[$arraytopanalysis].scanStatus.timestamp")
     RunecastResultsTimeTS=$(date -d "$RunecastResultsTime" +"%s")
-    RunecastResultsStatus=$(echo "$RunecastAnalysisUrl" | jq --raw-output ".results[0].scanStatus.status")
-    
+    RunecastResultsStatus=$(echo "$RunecastAnalysisUrl" | jq --raw-output ".results[$arraytopanalysis].scanStatus.status")
+    RunecastTopAnalysisJSON=$(echo "$RunecastAnalysisUrl" | jq --raw-output ".results[$arraytopanalysis] | .")
 
   declare -i arrayanalysis=0
-  for row in $(echo "$RunecastAnalysisUrl" | jq -r '.results[0].issues[].id'); do
-    RunecastAnalysisIssueID=$(echo "$RunecastAnalysisUrl" | jq --raw-output ".results[].issues[$arrayanalysis].id")
-    RunecastAnalysisIssueDisplayID=$(echo "$RunecastAnalysisUrl" | jq --raw-output ".results[].issues[$arrayanalysis].issueDisplayId")
-    RunecastAnalysisIssueAffects=$(echo "$RunecastAnalysisUrl" | jq --raw-output ".results[].issues[$arrayanalysis].affects")
-    RunecastAnalysisIssueProduct=$(echo "$RunecastAnalysisUrl" | jq --raw-output ".results[].issues[$arrayanalysis].products[0].name")
-    RunecastAnalysisIssueAppliesTo=$(echo "$RunecastAnalysisUrl" | jq --raw-output ".results[].issues[$arrayanalysis].appliesTo")
-    RunecastAnalysisIssueSeverity=$(echo "$RunecastAnalysisUrl" | jq --raw-output ".results[].issues[$arrayanalysis].severity")
-    RunecastAnalysisIssueType=$(echo "$RunecastAnalysisUrl" | jq --raw-output ".results[].issues[$arrayanalysis].type")
-    RunecastAnalysisIssueTitle=$(echo "$RunecastAnalysisUrl" | jq --raw-output ".results[].issues[$arrayanalysis].title" | awk '{gsub(",", "", $0); print}' | awk '{gsub(/ /,"\\ ");print}')
-    RunecastAnalysisIssueURL=$(echo "$RunecastAnalysisUrl" | jq --raw-output ".results[].issues[$arrayanalysis].url")
+  for row in $(echo "$RunecastTopAnalysisJSON" | jq -r '.issues[].id'); do
+    RunecastAnalysisIssueID=$(echo "$RunecastTopAnalysisJSON" | jq --raw-output ".issues[$arrayanalysis].id")
+    RunecastAnalysisIssueDisplayID=$(echo "$RunecastTopAnalysisJSON" | jq --raw-output ".issues[$arrayanalysis].issueDisplayId")
+    RunecastAnalysisIssueAffects=$(echo "$RunecastTopAnalysisJSON" | jq --raw-output ".issues[$arrayanalysis].affects")
+    RunecastAnalysisIssueProduct=$(echo "$RunecastTopAnalysisJSON" | jq --raw-output ".issues[$arrayanalysis].products[0].name")
+    RunecastAnalysisIssueAppliesTo=$(echo "$RunecastTopAnalysisJSON" | jq --raw-output ".issues[$arrayanalysis].appliesTo")
+    RunecastAnalysisIssueSeverity=$(echo "$RunecastTopAnalysisJSON" | jq --raw-output ".issues[$arrayanalysis].severity")
+    RunecastAnalysisIssueType=$(echo "$RunecastTopAnalysisJSON" | jq --raw-output ".issues[$arrayanalysis].type")
+    RunecastAnalysisIssueTitle=$(echo "$RunecastTopAnalysisJSON" | jq --raw-output ".issues[$arrayanalysis].title" | awk '{gsub(",", "", $0); print}' | awk '{gsub(/ /,"\\ ");print}')
+    RunecastAnalysisIssueURL=$(echo "$RunecastTopAnalysisJSON" | jq --raw-output ".issues[$arrayanalysis].url")
     [[ ! -z "$RunecastAnalysisIssueURL" ]] || RunecastAnalysisIssueURL="None"
-    RunecastAnalysisIssueObjectsCount=$(echo "$RunecastAnalysisUrl" | jq --raw-output ".results[].issues[$arrayanalysis].affectedObjectsCount")
-    RunecastAnalysisIssueStatus=$(echo "$RunecastAnalysisUrl" | jq --raw-output ".results[].issues[$arrayanalysis].status")
-    RunecastAnalysisIssuesAffectedJSON=$(echo "$RunecastAnalysisUrl" | jq --raw-output ".results[].issues[$arrayanalysis].affectedObjects | .")
+    RunecastAnalysisIssueObjectsCount=$(echo "$RunecastTopAnalysisJSON" | jq --raw-output ".issues[$arrayanalysis].affectedObjectsCount")
+    RunecastAnalysisIssueStatus=$(echo "$RunecastTopAnalysisJSON" | jq --raw-output ".issues[$arrayanalysis].status")
+    RunecastAnalysisIssuesAffectedJSON=$(echo "$RunecastTopAnalysisJSON" | jq --raw-output ".issues[$arrayanalysis].affectedObjects | .")
     
     ##Un-comment the following echo for debugging
     #echo "runecast_results_analysis,rc2Appliance=$runecastServer,rc2IssueID=$RunecastAnalysisIssueID,rc2IssueDisplayID=$RunecastAnalysisIssueDisplayID,rc2IssueAffects=$RunecastAnalysisIssueAffects,rc2IssueProduct-=$RunecastAnalysisIssueProduct,rc2IssueApplietsTo=$RunecastAnalysisIssueAppliesTo,rc2IssueSeverity=$RunecastAnalysisIssueSeverity,rc2IssueType=$RunecastAnalysisIssueType,rc2IssueTitle=$RunecastAnalysisIssueTitle,rc2IssueURL=$RunecastAnalysisIssueURL,rc2IssueStatus=$RunecastAnalysisIssueStatus rc2IssueObjectsCount=$RunecastAnalysisIssueObjectsCount $RunecastResultsTimeTS"
@@ -140,3 +142,5 @@ RunecastAnalysisUrl=$(curl -X GET --header "Accept:application/json" --header "A
     
     arrayanalysis=$arrayanalysis+1
   done
+  arraytopanalysis=$arraytopanalysis+1
+done
