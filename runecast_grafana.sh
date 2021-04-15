@@ -106,6 +106,7 @@ RunecastAnalysisUrl=$(curl -X GET --header "Accept:application/json" --header "A
     RunecastAnalysisIssueType=$(echo "$RunecastAnalysisUrl" | jq --raw-output ".results[].issues[$arrayanalysis].type")
     RunecastAnalysisIssueTitle=$(echo "$RunecastAnalysisUrl" | jq --raw-output ".results[].issues[$arrayanalysis].title" | awk '{gsub(",", "", $0); print}' | awk '{gsub(/ /,"\\ ");print}')
     RunecastAnalysisIssueURL=$(echo "$RunecastAnalysisUrl" | jq --raw-output ".results[].issues[$arrayanalysis].url")
+    [[ ! -z "$RunecastAnalysisIssueURL" ]] || RunecastAnalysisIssueURL="None"
     RunecastAnalysisIssueObjectsCount=$(echo "$RunecastAnalysisUrl" | jq --raw-output ".results[].issues[$arrayanalysis].affectedObjectsCount")
     RunecastAnalysisIssueStatus=$(echo "$RunecastAnalysisUrl" | jq --raw-output ".results[].issues[$arrayanalysis].status")
     RunecastAnalysisIssuesAffectedJSON=$(echo "$RunecastAnalysisUrl" | jq --raw-output ".results[].issues[$arrayanalysis].affectedObjects | .")
